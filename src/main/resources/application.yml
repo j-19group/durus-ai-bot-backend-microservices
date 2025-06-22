@@ -1,0 +1,104 @@
+spring:
+  config:
+    import: file:.env.properties
+  application:
+    name: telegram-service
+
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    name: ${DATABASE_NAME}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DATABASE:0}
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 8
+        min-idle: 2
+
+  kafka:
+    topics:
+      generation-requests: generation_requests
+      generation-results: generation_results
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        acks: all
+        retries: 3
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:telegram-bot-group}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+    template:
+      default-topic: generation_requests
+
+
+
+telegrambots:
+  enabled: true
+  bots:
+    - username: ${BOT_TARGETOLOG_USERNAME}
+      token: ${BOT_TARGETOLOG_API}
+
+    - username: ${BOT_MARKTEOLOG_USERNAME}
+      token: ${BOT_MARKTEOLOG_API}
+
+    - username: ${BOT_PHOTO_USERNAME}
+      token: ${BOT_PHOTO_API}
+
+
+
+
+
+openai:
+  api-key: ${OPENAI_API}
+  url: https://api.openai.com/v1/images/generations
+
+deepseek:
+  api-key: ${DEEPSEEK_API}
+
+runway:
+  api-key: ${RUNWAY_API}
+kieai:
+  api-key: ${KIEAI_API}
+  api-url: https://kieai.erweima.ai
+aws:
+  s3:
+    bucket: durusai-bot
+    base-url: https://storage.yandexcloud.kz
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+    region: kz1
+
+logging:
+  level:
+    com.server.telegramservice.service.S3Service: DEBUG
+    com.server.telegramservice: INFO
+    org.telegram.telegrambots: WARN
+    org.springframework.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+
+
+
